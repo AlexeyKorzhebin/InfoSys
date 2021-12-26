@@ -10,6 +10,7 @@
 #include "NewCellTypes/GridCellCheck.h"
 #include "NewCellTypes/GridCellNumeric.h"
 #include "NewCellTypes/GridCellDateTime.h"
+#include "Database.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -73,7 +74,7 @@ void InfoSysDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(InfoSysDlg)
-	DDX_Control(pDX, IDC_TRACE, m_TraceWnd);
+	/*DDX_Control(pDX, IDC_TRACE, m_TraceWnd);
 	DDX_Control(pDX, IDC_SPIN_ROW, m_RowSpin);
 	DDX_Control(pDX, IDC_SPIN_FIXROW, m_FixRowSpin);
 	DDX_Control(pDX, IDC_SPIN_FIXCOL, m_FixColSpin);
@@ -81,7 +82,7 @@ void InfoSysDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_FIXCOLS, m_nFixCols);
 	DDX_Text(pDX, IDC_EDIT_FIXROWS, m_nFixRows);
 	DDX_Text(pDX, IDC_EDIT_COLS, m_nCols);
-	DDX_Text(pDX, IDC_EDIT_ROWS, m_nRows);
+	DDX_Text(pDX, IDC_EDIT_ROWS, m_nRows);*/
 	DDX_Control(pDX, IDC_GRID, m_Grid);             // associate the grid window with a C++ object
 	//}}AFX_DATA_MAP
 }
@@ -204,11 +205,7 @@ BOOL InfoSysDlg::OnInitDialog()
 	GetClientRect(rect);
 	m_OldSize = CSize(rect.Width(), rect.Height());
 
-	// init spin controls
-	m_RowSpin.SetRange(0,999);
-	m_FixRowSpin.SetRange(0,999);
-	m_FixColSpin.SetRange(0,999);
-	m_ColSpin.SetRange(0,999);
+	
 
 
 	/////////////////////////////////////////////////////////////////////////
@@ -220,6 +217,10 @@ BOOL InfoSysDlg::OnInitDialog()
 
 	m_Grid.EnableDragAndDrop(TRUE);
 	m_Grid.GetDefaultCell(FALSE, FALSE)->SetBackClr(RGB(0xFF, 0xFF, 0xE0));
+
+	Database& db = db.getInstance();
+	db.load();
+
 
     OnEditable();
     OnVirtualMode();    // Sets the grid mode, fills the grid
@@ -252,6 +253,8 @@ BOOL InfoSysDlg::OnInitDialog()
     m_Grid.AutoSize();
 
 	m_Grid.SetCompareFunction(CGridCtrl::pfnCellNumericCompare);
+
+	
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -512,7 +515,7 @@ BOOL CALLBACK EnumProc(HWND hwnd, LPARAM lParam)
 			pWnd->MoveWindow(rect.left+pTranslate->cx, rect.top+pTranslate->cy, 
 							 rect.Width(), rect.Height(), FALSE);
 	}
-	else if (hwnd == pDlg->m_TraceWnd.GetSafeHwnd())
+	/*else if (hwnd == pDlg->m_TraceWnd.GetSafeHwnd())
 	{
 		if (  ((rect.top >= 7 && pTranslate->cy > 0) || rect.Height() > 20) &&
 			  ((rect.left >= 7 && pTranslate->cx > 0) || rect.Width() > 20)   )
@@ -522,7 +525,7 @@ BOOL CALLBACK EnumProc(HWND hwnd, LPARAM lParam)
 		else
 			pWnd->MoveWindow(rect.left+pTranslate->cx, rect.top+pTranslate->cy, 
 							 rect.Width(), rect.Height(), FALSE);
-	}
+	}*/
 	else 
 	{
         if (pWnd->GetDlgCtrlID() == IDC_SIZEBOX)
@@ -909,10 +912,14 @@ void InfoSysDlg::OnVirtualMode()
     }
     else
     {
+		Database& db = db.getInstance();
+		const Database::RecordMap& map = db.getRecords();
+
+
         m_nFixCols = 1;
 	    m_nFixRows = 1;
-	    m_nCols = 6;
-	    m_nRows = 16;
+	    m_nCols = sizeof(db.m_fields)/ sizeof(db.m_fields[0]);
+		m_nRows = map.size();
 
         m_Grid.SetAutoSizeStyle();
 
@@ -943,26 +950,26 @@ void InfoSysDlg::OnVirtualMode()
 		    	Item.col = col;
 
 			    if (row < m_nFixRows)
-                    str.Format(_T("Column %d"),col);
-                else if (col < m_nFixCols) 
-                    str.Format(_T("Row %d"), row);
+                    str = db.m_fields[col];
+                //else if (col < m_nFixCols) 
+                //    str.Format(_T("Row %d"), row);
                 else 
 				    str.Format(_T("%d"),row*col);
                 Item.strText = str;
 
-    			if (rand() % 10 == 1)
-	    		{
-                    COLORREF clr = RGB(rand()%128 + 128, rand()%128 + 128, rand()%128 + 128);
-                    Item.crBkClr = clr;             // or - m_Grid.SetItemBkColour(row, col, clr);
-                    Item.crFgClr = RGB(255,0,0);    // or - m_Grid.SetItemFgColour(row, col, RGB(255,0,0));				    
-                    Item.mask    |= (GVIF_BKCLR|GVIF_FGCLR);
-    			}
+    			//if (rand() % 10 == 1)
+	    		//{
+       //             COLORREF clr = RGB(rand()%128 + 128, rand()%128 + 128, rand()%128 + 128);
+       //             Item.crBkClr = clr;             // or - m_Grid.SetItemBkColour(row, col, clr);
+       //             Item.crFgClr = RGB(255,0,0);    // or - m_Grid.SetItemFgColour(row, col, RGB(255,0,0));				    
+       //             Item.mask    |= (GVIF_BKCLR|GVIF_FGCLR);
+    			//}
 
-    			if (col < m_Grid.GetFixedColumnCount())
-                {
-                    Item.iImage = rand()%m_ImageList.GetImageCount();
-                    Item.mask  |= (GVIF_IMAGE);
-                }
+    			//if (col < m_Grid.GetFixedColumnCount())
+       //         {
+       //             Item.iImage = rand()%m_ImageList.GetImageCount();
+       //             Item.mask  |= (GVIF_IMAGE);
+       //         }
 
         		m_Grid.SetItem(&Item);
 	    	}
@@ -1132,19 +1139,13 @@ void InfoSysDlg::Trace(LPCTSTR szFmt, ...)
 
 	str.Replace(_T("\n"), _T("\r\n"));
 
-	CString strWndText;
-	m_TraceWnd.GetWindowText(strWndText);
-	strWndText += str;
-	m_TraceWnd.SetWindowText(strWndText);
 
-//	m_TraceWnd.SetSel(str.GetLength()-1, str.GetLength()-2, FALSE);
-	m_TraceWnd.LineScroll(-m_TraceWnd.GetLineCount());
-	m_TraceWnd.LineScroll(m_TraceWnd.GetLineCount()-4);
+
 }
 
 void InfoSysDlg::OnCleartrace() 
 {
-	m_TraceWnd.SetWindowText(_T(""));
+
 }
 
 void InfoSysDlg::OnHide2ndrowcolumn()

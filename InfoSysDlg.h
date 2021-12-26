@@ -22,12 +22,7 @@ public:
 // Dialog Data
 	//{{AFX_DATA(InfoSysDlg)
 	enum { IDD = IDD_GRIDCTRLDEMO_DIALOG };
-	CEdit	m_TraceWnd;
-	CButton	m_CallbackButton;
-	CSpinButtonCtrl	m_RowSpin;
-	CSpinButtonCtrl	m_FixRowSpin;
-	CSpinButtonCtrl	m_FixColSpin;
-	CSpinButtonCtrl	m_ColSpin;
+
 	CStatic	m_GridRect;
 	int		m_nFixCols;
 	int		m_nFixRows;
@@ -57,6 +52,8 @@ public:
 	//}}AFX_DATA
 	CGridCtrl m_Grid;
 	CSize m_OldSize;
+
+
 	static bool VirtualCompare(int c1, int c2);
 
 	// ClassWizard generated virtual function overrides

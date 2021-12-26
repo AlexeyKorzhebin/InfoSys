@@ -295,6 +295,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Database.cpp" />
     <ClCompile Include="InfoSysApp.cpp" />
     <ClCompile Include="InfoSysDlg.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -320,6 +321,7 @@
     <ResourceCompile Include="InfoSysApp.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Database.h" />
     <ClInclude Include="InfoSysApp.h" />
     <ClInclude Include="InfoSysDlg.h" />
     <ClInclude Include="Resource.h" />

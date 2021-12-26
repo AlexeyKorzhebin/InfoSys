@@ -2,6 +2,7 @@
 #include <string>
 #include <map>
 #include <memory> // for std::unique_ptr and std::make_unique
+#include <vector>
 
 
 
@@ -14,8 +15,11 @@ class Database
 
 public:
 
+	const wchar_t* m_fields[6] = { L"ID", L"УДК", L"Автор", L"Название", L"Год", L"ISBN" };
+	
 	struct BiblioRecord
 	{
+		std::vector<std::wstring> fields;
 		int id; // key
 		std::wstring udk;
 		std::wstring fio;
@@ -24,7 +28,7 @@ public:
 		std::wstring isbn;
 	};
 
-	typedef std::map<int, Database::BiblioRecord> RecordMap;
+	typedef std::vector<Database::BiblioRecord> RecordMap;
 	static Database& getInstance() noexcept
 	{
 		static Database m_db;
@@ -36,7 +40,6 @@ public:
 	void load();
 	void save();
 
-	const wchar_t* m_fields[6] = { L"ID", L"УДК", L"Автор", L"Название", L"Год", L"ISBN" };
 
 private:
 	RecordMap m_records;

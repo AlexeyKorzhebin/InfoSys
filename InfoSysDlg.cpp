@@ -919,7 +919,7 @@ void InfoSysDlg::OnVirtualMode()
         m_nFixCols = 1;
 	    m_nFixRows = 1;
 	    m_nCols = sizeof(db.m_fields)/ sizeof(db.m_fields[0]);
-		m_nRows = map.size();
+		m_nRows = map.size() > 0? map.size(): 1;
 
         m_Grid.SetAutoSizeStyle();
 
@@ -949,12 +949,13 @@ void InfoSysDlg::OnVirtualMode()
 	    		Item.row = row;
 		    	Item.col = col;
 
-			    if (row < m_nFixRows)
-                    str = db.m_fields[col];
-                //else if (col < m_nFixCols) 
-                //    str.Format(_T("Row %d"), row);
-                else 
-				    str.Format(_T("%d"),row*col);
+				if (row < m_nFixRows)
+					str = db.m_fields[col];
+				//else if (col < m_nFixCols) 
+				//    str.Format(_T("Row %d"), row);
+				else
+					str = map[row].fields[col].c_str();
+				    //str.Format(_T("%d"),row*col);
                 Item.strText = str;
 
     			//if (rand() % 10 == 1)

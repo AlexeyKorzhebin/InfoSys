@@ -4,12 +4,16 @@
 #include "stdafx.h"
 #include "InfoSysApp.h"
 #include "InfoSysDlg.h"
+#include <sstream>
+#include <fstream>
+#include <codecvt>
 
-#ifdef _DEBUG
+
+#/*ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
-#endif
+#endif*/
 
 /////////////////////////////////////////////////////////////////////////////
 // InfoSysApp
@@ -45,6 +49,9 @@ BOOL InfoSysApp::InitInstance()
 	Enable3dControlsStatic();	// Call this when linking to MFC statically
 #endif
 #endif
+
+	std::locale::global(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+
 
 	InfoSysDlg dlg;
 	m_pMainWnd = &dlg;

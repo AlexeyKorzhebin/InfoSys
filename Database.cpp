@@ -17,7 +17,6 @@ void Database::load()
 
 	const int amount_fields = 6;
 
-	std::locale::global(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 
 	// open file
 	std::wifstream ifs(fname.c_str());
@@ -36,11 +35,13 @@ void Database::load()
 	}
 
 	m_records.clear();
+		
 
 	int count = 0;
 	// parsing data
 	for (std::list<std::wstring>::iterator itr = buffer.begin(); itr != buffer.end(); itr++)
 	{
+		BiblioRecord rec;
 		std::wstringstream  ss(*itr);
 		std::vector<std::wstring> res;
 
@@ -64,16 +65,18 @@ void Database::load()
 		if (res.size() < amount_fields)
 			throw std::exception( (std::string("Non correct record:{}") + std::to_string(count)).c_str() );
 
+		rec.fields = res;
+
 		// filling out the record
-		BiblioRecord rec;
-		rec.id = std::stoi(res[0]);
+		/*rec.id = std::stoi(res[0]);
 		rec.udk = res[1];
 		rec.fio = res[2];
 		rec.bookName = res[3];
 		rec.year = res[4];
-		rec.isbn = res[5];
+		rec.isbn = res[5];*/
 
-		m_records.insert({ rec.id, rec });
+		//m_records.insert({ rec.id, rec });
+		m_records.push_back(rec);
 		count++;
 
 	}

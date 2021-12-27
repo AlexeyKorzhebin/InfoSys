@@ -9,9 +9,9 @@
 #include <format>
 #include <iostream>
 
-void Database::load()
+void Database::load(const std::wstring& fname)
 {
-	std::wstring fname = L"Data/biblio.db";
+	
 	std::list<std::wstring> buffer;
 	std::wstring line;
 
@@ -34,6 +34,7 @@ void Database::load()
 		buffer.push_back(line);
 	}
 
+	// clear current records
 	m_records.clear();
 		
 
@@ -86,7 +87,26 @@ void Database::load()
 
 
 
-void Database::save()
+void Database::save(const std::wstring& fname)
 {
+	std::wofstream ofs(fname.c_str());
+
+	// save the header
+	for each (const std::wstring fieldName in fieldNames)
+		ofs << fieldName.c_str() << L";";
+
+	ofs << std::endl;
+
+	// save data
+	for each (const BiblioRecord record in m_records)
+	{
+		for each (const std::wstring field in record.fields)
+		{
+			ofs << field.c_str() << L";";
+		}
+		ofs << std::endl;
+	}
+
+	// save data
 
 }

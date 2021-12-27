@@ -218,8 +218,9 @@ BOOL InfoSysDlg::OnInitDialog()
 	m_Grid.EnableDragAndDrop(TRUE);
 	m_Grid.GetDefaultCell(FALSE, FALSE)->SetBackClr(RGB(0xFF, 0xFF, 0xE0));
 
-	Database& db = db.getInstance();
-	db.load();
+	std::wstring db_path = L"Data/biblio.db";
+	Database::getInstance().load(db_path);
+	Database::getInstance().save(L"Data/biblio_backup.db");
 
 
     OnEditable();
@@ -282,7 +283,7 @@ void InfoSysDlg::OnUpdateEditCols()
 	if (!::IsWindow(m_Grid.m_hWnd)) return;
 	UpdateData();
 
-    int nOldNumCols = m_Grid.GetColumnCount();
+    const int nOldNumCols = m_Grid.GetColumnCount();
 
 	TRY { 
         m_Grid.SetColumnCount(m_nCols); 
@@ -918,7 +919,7 @@ void InfoSysDlg::OnVirtualMode()
 
         m_nFixCols = 1;
 	    m_nFixRows = 1;
-	    m_nCols = sizeof(db.m_fields)/ sizeof(db.m_fields[0]);
+	    m_nCols = sizeof(db.fieldNames)/ sizeof(db.fieldNames[0]);
 		m_nRows = map.size() > 0? map.size(): 1;
 
         m_Grid.SetAutoSizeStyle();
@@ -950,7 +951,7 @@ void InfoSysDlg::OnVirtualMode()
 		    	Item.col = col;
 
 				if (row < m_nFixRows)
-					str = db.m_fields[col];
+					str = db.fieldNames[col];
 				//else if (col < m_nFixCols) 
 				//    str.Format(_T("Row %d"), row);
 				else

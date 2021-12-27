@@ -15,7 +15,7 @@ class Database
 
 public:
 
-	const wchar_t* m_fields[6] = { L"ID", L"УДК", L"Автор", L"Название", L"Год", L"ISBN" };
+	const wchar_t* fieldNames[6] = { L"ID", L"УДК", L"Автор", L"Название", L"Год", L"ISBN" };
 	
 	struct BiblioRecord
 	{
@@ -37,8 +37,8 @@ public:
 
 	const RecordMap& getRecords() const { return m_records; }
 
-	void load();
-	void save();
+	void load(const std::wstring& fname);
+	void save(const std::wstring& fname);
 
 
 private:

@@ -218,9 +218,17 @@ BOOL InfoSysDlg::OnInitDialog()
 	m_Grid.EnableDragAndDrop(TRUE);
 	m_Grid.GetDefaultCell(FALSE, FALSE)->SetBackClr(RGB(0xFF, 0xFF, 0xE0));
 
-	std::wstring db_path = L"Data/biblio.db";
-	Database::getInstance().load(db_path);
-	Database::getInstance().save(L"Data/biblio_backup.db");
+	try {
+		Database::getInstance().load(L"Data/biblio.db");
+	}
+	catch (std::exception ex)
+	{
+		MessageBox(ex.what(), "Ошибка загрузки базы данных", MB_OK | MB_ICONERROR);
+	}
+
+
+//TODO: move into special function
+//	Database::getInstance().save(L"Data/biblio_backup.db");
 
 
     OnEditable();
@@ -913,13 +921,13 @@ void InfoSysDlg::OnVirtualMode()
     }
     else
     {
-		Database& db = db.getInstance();
+		const Database& db = db.getInstance();
 		const Database::RecordMap& map = db.getRecords();
 
 
         m_nFixCols = 1;
 	    m_nFixRows = 1;
-	    m_nCols = sizeof(db.fieldNames)/ sizeof(db.fieldNames[0]);
+	    m_nCols = db.amountFields;
 		m_nRows = map.size() > 0? map.size(): 1;
 
         m_Grid.SetAutoSizeStyle();
@@ -958,21 +966,6 @@ void InfoSysDlg::OnVirtualMode()
 					str = map[row].fields[col].c_str();
 				    //str.Format(_T("%d"),row*col);
                 Item.strText = str;
-
-    			//if (rand() % 10 == 1)
-	    		//{
-       //             COLORREF clr = RGB(rand()%128 + 128, rand()%128 + 128, rand()%128 + 128);
-       //             Item.crBkClr = clr;             // or - m_Grid.SetItemBkColour(row, col, clr);
-       //             Item.crFgClr = RGB(255,0,0);    // or - m_Grid.SetItemFgColour(row, col, RGB(255,0,0));				    
-       //             Item.mask    |= (GVIF_BKCLR|GVIF_FGCLR);
-    			//}
-
-    			//if (col < m_Grid.GetFixedColumnCount())
-       //         {
-       //             Item.iImage = rand()%m_ImageList.GetImageCount();
-       //             Item.mask  |= (GVIF_IMAGE);
-       //         }
-
         		m_Grid.SetItem(&Item);
 	    	}
         }

@@ -16,6 +16,8 @@ class Database
 public:
 
 	const wchar_t* fieldNames[6] = { L"ID", L"УДК", L"Автор", L"Название", L"Год", L"ISBN" };
+	const int amountFields = 6;
+
 	
 	struct BiblioRecord
 	{

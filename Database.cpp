@@ -15,8 +15,6 @@ void Database::load(const std::wstring& fname)
 	std::list<std::wstring> buffer;
 	std::wstring line;
 
-	const int amount_fields = 6;
-
 
 	// open file
 	std::wifstream ifs(fname.c_str());
@@ -24,7 +22,7 @@ void Database::load(const std::wstring& fname)
 	// check status of file
 	if (!ifs)
 	{
-		throw std::exception("Error opening input file");
+		throw std::exception("Файл не существует или указан неправильный путь");
 	}
 
 	// reading raw data
@@ -40,7 +38,7 @@ void Database::load(const std::wstring& fname)
 
 	int count = 0;
 	// parsing data
-	for (std::list<std::wstring>::iterator itr = buffer.begin(); itr != buffer.end(); itr++)
+	for (std::list<std::wstring>::const_iterator itr = buffer.begin(); itr != buffer.end(); itr++)
 	{
 		BiblioRecord rec;
 		std::wstringstream  ss(*itr);
@@ -57,26 +55,18 @@ void Database::load(const std::wstring& fname)
 		// if itr is first string then check field's names
 		if (itr == buffer.begin())
 		{
-			if (res[0] == L"id" && res[1] == L"UDK" && res[2] == L"FIO" && res[3] == L"name" && res[4] == L"year" && res[5] == L"ISBN")
+			if (res.at(0) == L"id" && res.at(1) == L"UDK" && res.at(2) == L"FIO" && res.at(3) == L"name" && res.at(4) == L"year" && res.at(5) == L"ISBN")
 				continue;
 			else
-				throw std::exception("Non correct file format");
+				throw std::exception("Некорректный формат файла");
 		}
 
-		if (res.size() < amount_fields)
-			throw std::exception( (std::string("Non correct record:{}") + std::to_string(count)).c_str() );
+		if (res.size() < amountFields)
+			throw std::exception( (std::string("Некорректная запись:") + std::to_string(count)).c_str() );
 
 		rec.fields = res;
 
 		// filling out the record
-		/*rec.id = std::stoi(res[0]);
-		rec.udk = res[1];
-		rec.fio = res[2];
-		rec.bookName = res[3];
-		rec.year = res[4];
-		rec.isbn = res[5];*/
-
-		//m_records.insert({ rec.id, rec });
 		m_records.push_back(rec);
 		count++;
 
@@ -92,21 +82,20 @@ void Database::save(const std::wstring& fname)
 	std::wofstream ofs(fname.c_str());
 
 	// save the header
-	for each (const std::wstring fieldName in fieldNames)
-		ofs << fieldName.c_str() << L";";
+	for (const auto fieldName : fieldNames)
+		ofs << fieldName << L";";
 
 	ofs << std::endl;
 
 	// save data
-	for each (const BiblioRecord record in m_records)
+	for (const auto record : m_records)
 	{
-		for each (const std::wstring field in record.fields)
+		for (const auto field : record.fields)
 		{
 			ofs << field.c_str() << L";";
 		}
 		ofs << std::endl;
 	}
 
-	// save data
 
 }

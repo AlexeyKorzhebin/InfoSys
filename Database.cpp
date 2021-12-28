@@ -99,3 +99,25 @@ void Database::save(const std::wstring& fname)
 
 
 }
+
+int Database::insertRow(int row)
+{
+	// fin max_id
+	const auto id = getMaxID() + 1;
+	BiblioRecord rec;
+	rec.fields.resize(amountFields);
+	// fill out the field "id"
+	rec.fields[0] = std::to_wstring(id);
+
+	if(m_records.empty())
+		m_records.push_back(rec);
+	else
+		m_records.insert(m_records.begin() + row - 1, rec);
+	
+	return id;
+}
+
+void Database::deleteRow(int row)
+{
+	m_records.erase(m_records.begin() + row);
+}

@@ -3,8 +3,7 @@
 #include <map>
 #include <memory> // for std::unique_ptr and std::make_unique
 #include <vector>
-
-
+#include <codecvt>
 
 class Database
 {
@@ -12,6 +11,17 @@ class Database
 	Database() noexcept {}
 	Database(const Database&) noexcept {}
 	Database& operator=(const Database&) noexcept {}
+
+	int getMaxID() const
+	{
+		int res = 0;
+		for (auto rec : m_records)
+		{
+			const auto v = std::stoi(rec.fields[0]);
+			res = (v > res) ? v : res;
+		}
+		return res;
+	}
 
 public:
 
@@ -38,6 +48,13 @@ public:
 	}
 
 	const RecordMap& getRecords() const { return m_records; }
+	void updateData(int row, int col, const std::wstring& s) 
+	{
+		m_records.at(row).fields.at(col) = s;
+	}
+
+	int insertRow(int row);
+	void deleteRow(int row);
 
 	void load(const std::wstring& fname);
 	void save(const std::wstring& fname);

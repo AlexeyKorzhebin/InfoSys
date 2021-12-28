@@ -234,7 +234,7 @@ BOOL InfoSysDlg::OnInitDialog()
     OnEditable();
     OnVirtualMode();    // Sets the grid mode, fills the grid
 	OnListmode();
-    OnCellReadonly();
+    //OnCellReadonly();
     OnItalics();
     OnTitletips();
     OnTrackfocus();
@@ -247,7 +247,7 @@ BOOL InfoSysDlg::OnInitDialog()
     OnHorzGridLines();
     OnAllowSelection();
     OnCallbackFunction();
-    OnVertical();
+    //OnVertical();
     OnHeaderSort();
     OnExpandUseFixed();
 	OnRejectEditAttempts();
@@ -414,6 +414,7 @@ void InfoSysDlg::OnHorzGridLines()
 
 void InfoSysDlg::OnListmode() 
 {
+	const auto& db = Database::getInstance();
     m_bListMode = !m_bListMode;
 	m_Grid.SetListMode(m_bListMode);
     UpdateMenuUI();
@@ -640,11 +641,24 @@ void InfoSysDlg::OnTitletips()
 void InfoSysDlg::OnInsertRow() 
 {
 	int nRow = m_Grid.GetFocusCell().row;
+	auto& db = Database::getInstance();
     if (nRow >= 0)
     {
-	    m_Grid.InsertRow(_T("Newest Row"), nRow);	
+		auto id = db.insertRow(nRow);
+	    m_Grid.InsertRow(std::to_string(id).c_str(), nRow);	
 	    m_Grid.Invalidate();
     }
+	else
+	{
+		// if not exist rows then add nRow = 1
+		if (db.getRecords().empty())
+		{
+			nRow = 1;
+			const auto id = db.insertRow(nRow);
+			m_Grid.InsertRow(std::to_string(id).c_str());
+			m_Grid.Invalidate();
+		}
+	}
 }
 
 void InfoSysDlg::OnDeleteRow() 
@@ -653,6 +667,7 @@ void InfoSysDlg::OnDeleteRow()
     if (nRow >= 0)
     {
 	    m_Grid.DeleteRow(nRow);	
+		Database::getInstance().deleteRow(nRow - 1);
 	    m_Grid.Invalidate();
     }
 }
@@ -694,6 +709,13 @@ void InfoSysDlg::OnGridEndEdit(NMHDR *pNotifyStruct, LRESULT* pResult)
     NM_GRIDVIEW* pItem = (NM_GRIDVIEW*) pNotifyStruct;
     Trace(_T("End Edit on row %d, col %d\n"), pItem->iRow, pItem->iColumn);
 	*pResult = (m_bRejectEditChanges)? -1 : 0;
+
+	auto str = m_Grid.GetItemText(pItem->iRow, pItem->iColumn);
+	auto& db = Database::getInstance();
+
+	USES_CONVERSION;
+	db.updateData(pItem->iRow - 1, pItem->iColumn, A2W((LPCTSTR)str));
+
 }
 
 // GVN_SELCHANGING
@@ -893,34 +915,34 @@ void InfoSysDlg::OnVirtualMode()
 
     m_bHeaderSort = m_Grid.GetHeaderSort();
 
-    if (m_bVirtualMode)
-    {
-        m_bEditable = m_Grid.IsEditable();
-        m_Grid.SetCallbackFunc(m_bCallback? GridCallback : NULL, 0);
+   // if (m_bVirtualMode)
+   // {
+   //     m_bEditable = m_Grid.IsEditable();
+   //     m_Grid.SetCallbackFunc(m_bCallback? GridCallback : NULL, 0);
 
-        m_nFixCols = 1;
-	    m_nFixRows = 1;
-	    m_nCols = 100;
-	    m_nRows = 100000;
+   //     m_nFixCols = 1;
+	  //  m_nFixRows = 1;
+	  //  m_nCols = 100;
+	  //  m_nRows = 100000;
 
-	    TRY {
-		    m_Grid.SetRowCount(m_nRows);
-		    m_Grid.SetColumnCount(m_nCols);
-		    m_Grid.SetFixedRowCount(m_nFixRows);
-		    m_Grid.SetFixedColumnCount(m_nFixCols);
-			m_Grid.AllowReorderColumn(m_bCallback!=0); // implemented now only if m_bCallback
-			m_Grid.EnableDragRowMode(m_bCallback!=0);
-			m_Grid.SetVirtualCompare(VirtualCompare);
-	    }
-	    CATCH (CMemoryException, e)
-	    {
-	    	e->ReportError();
-    		return;
-	    }
-        END_CATCH
-    }
-    else
-    {
+	  //  TRY {
+		 //   m_Grid.SetRowCount(m_nRows);
+		 //   m_Grid.SetColumnCount(m_nCols);
+		 //   m_Grid.SetFixedRowCount(m_nFixRows);
+		 //   m_Grid.SetFixedColumnCount(m_nFixCols);
+			//m_Grid.AllowReorderColumn(m_bCallback!=0); // implemented now only if m_bCallback
+			//m_Grid.EnableDragRowMode(m_bCallback!=0);
+			//m_Grid.SetVirtualCompare(VirtualCompare);
+	  //  }
+	  //  CATCH (CMemoryException, e)
+	  //  {
+	  //  	e->ReportError();
+   // 		return;
+	  //  }
+   //     END_CATCH
+   // }
+   // else
+   // {
 		const Database& db = db.getInstance();
 		const Database::RecordMap& map = db.getRecords();
 
@@ -928,7 +950,7 @@ void InfoSysDlg::OnVirtualMode()
         m_nFixCols = 1;
 	    m_nFixRows = 1;
 	    m_nCols = db.amountFields;
-		m_nRows = map.size() > 0? map.size(): 1;
+		m_nRows = map.size() > 0? map.size() + 1: 1;
 
         m_Grid.SetAutoSizeStyle();
 
@@ -936,40 +958,47 @@ void InfoSysDlg::OnVirtualMode()
 		    m_Grid.SetRowCount(m_nRows);
 		    m_Grid.SetColumnCount(m_nCols);
 		    m_Grid.SetFixedRowCount(m_nFixRows);
-		    m_Grid.SetFixedColumnCount(m_nFixCols);
+		    //m_Grid.SetFixedColumnCount(m_nFixCols);
 	    }
 	    CATCH (CMemoryException, e)
 	    {
 	    	e->ReportError();
     		return;
 	    }
-        END_CATCH
+		END_CATCH
+
+		// make title
+		int col_count = 0;
+		for (auto name : db.fieldNames) 
+		{
+			GV_ITEM Item;
+			Item.mask = GVIF_TEXT;
+			Item.row = 0;
+			Item.col = col_count;
+			Item.strText = name;
+			Item.nFormat = DT_LEFT | DT_WORDBREAK;
+			m_Grid.SetItem(&Item);
+			col_count++;
+		}
+
 
 	    // fill rows/cols with text
-	    for (int row = 0; row < m_Grid.GetRowCount(); row++)
+	    for (int row = 0; row < map.size(); row++)
         {
 	    	for (int col = 0; col < m_Grid.GetColumnCount(); col++)
 		    { 
                 CString str;
-
 			    GV_ITEM Item;
 
     			Item.mask = GVIF_TEXT;
-	    		Item.row = row;
+	    		Item.row = row + 1;
 		    	Item.col = col;
-
-				if (row < m_nFixRows)
-					str = db.fieldNames[col];
-				//else if (col < m_nFixCols) 
-				//    str.Format(_T("Row %d"), row);
-				else
-					str = map[row].fields[col].c_str();
-				    //str.Format(_T("%d"),row*col);
-                Item.strText = str;
+				Item.nFormat = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX;
+                Item.strText = map.at(row).fields.at(col).c_str();
         		m_Grid.SetItem(&Item);
 	    	}
         }
-    }
+    //}
 
     //m_Grid.GetDefaultCell(FALSE,FALSE)->SetFormat(DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX|DT_END_ELLIPSIS);
     //m_Grid.GetDefaultCell(TRUE, FALSE)->SetFormat(DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX|DT_END_ELLIPSIS);

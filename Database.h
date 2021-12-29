@@ -32,12 +32,6 @@ public:
 	struct BiblioRecord
 	{
 		std::vector<std::wstring> fields;
-		int id; // key
-		std::wstring udk;
-		std::wstring fio;
-		std::wstring bookName;
-		std::wstring year;
-		std::wstring isbn;
 	};
 
 	typedef std::vector<Database::BiblioRecord> RecordMap;
@@ -55,6 +49,10 @@ public:
 
 	int insertRow(int row);
 	void deleteRow(int row);
+	void deleteAllRows() noexcept
+	{
+		m_records.clear();
+	}
 
 	void load(const std::wstring& fname);
 	void save(const std::wstring& fname);

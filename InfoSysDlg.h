@@ -12,6 +12,7 @@
 // InfoSysDlg dialog
 
 #include "GridCtrl_src/GridCtrl.h"
+#include <string>
 
 class InfoSysDlg : public CDialog
 {
@@ -53,6 +54,8 @@ public:
 	CGridCtrl m_Grid;
 	CSize m_OldSize;
 
+	std::wstring m_pathDB;
+	std::wstring m_pathBackup;
 
 	static bool VirtualCompare(int c1, int c2);
 
@@ -146,6 +149,8 @@ protected:
 #endif
 public:
 	afx_msg void OnHide2ndrowcolumn();
+	afx_msg void OnDeleteAllRows();
+	afx_msg void OnDestroy();
 };
 
 //{{AFX_INSERT_LOCATION}}

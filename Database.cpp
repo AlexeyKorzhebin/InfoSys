@@ -45,7 +45,7 @@ void Database::load(const std::wstring& fname)
 		std::vector<std::wstring> res;
 
 		// split string into token
-		while (ss.good())
+		while (ss.good() && res.size() < amountFields)
 		{
 			std::wstring substr;
 			std::getline(ss, substr, L';');
@@ -55,7 +55,7 @@ void Database::load(const std::wstring& fname)
 		// if itr is first string then check field's names
 		if (itr == buffer.begin())
 		{
-			if (res.at(0) == L"id" && res.at(1) == L"UDK" && res.at(2) == L"FIO" && res.at(3) == L"name" && res.at(4) == L"year" && res.at(5) == L"ISBN")
+			if (res.at(0) == L"ID" && res.at(1) == L"УДК" && res.at(2) == L"Автор" && res.at(3) == L"Название" && res.at(4) == L"Год" && res.at(5) == L"ISBN")
 				continue;
 			else
 				throw std::exception("Некорректный формат файла");
@@ -85,16 +85,22 @@ void Database::save(const std::wstring& fname)
 	for (const auto fieldName : fieldNames)
 		ofs << fieldName << L";";
 
-	ofs << std::endl;
 
 	// save data
 	for (const auto record : m_records)
 	{
+		ofs << std::endl;
 		for (const auto field : record.fields)
 		{
 			ofs << field.c_str() << L";";
+			//b_save = true;
 		}
-		ofs << std::endl;
+		
+		// if one field is exist then insert return caret
+		//if (b_save)
+		//{
+		//	ofs << std::endl;
+		//}
 	}
 
 
@@ -109,7 +115,8 @@ int Database::insertRow(int row)
 	// fill out the field "id"
 	rec.fields[0] = std::to_wstring(id);
 
-	if(m_records.empty())
+	//if(m_records.empty())
+	if(row == -1)
 		m_records.push_back(rec);
 	else
 		m_records.insert(m_records.begin() + row - 1, rec);

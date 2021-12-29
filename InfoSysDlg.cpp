@@ -68,6 +68,11 @@ InfoSysDlg::InfoSysDlg(CWnd* pParent /*=NULL*/)
 	m_bRow2Col2Hidden = FALSE;
 	//}}AFX_DATA_INIT
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_pathDB = L"Data/biblio.db";
+	m_pathBackup = L"Data/biblio_backup.db";
+
+
 }
 
 void InfoSysDlg::DoDataExchange(CDataExchange* pDX)
@@ -162,6 +167,8 @@ BEGIN_MESSAGE_MAP(InfoSysDlg, CDialog)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_CUT, OnUpdateEditCopyOrCut)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, OnUpdateEditPaste)
 #endif
+	ON_COMMAND(IDC_DELETEALL_ROW, &InfoSysDlg::OnDeleteAllRows)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -219,7 +226,7 @@ BOOL InfoSysDlg::OnInitDialog()
 	m_Grid.GetDefaultCell(FALSE, FALSE)->SetBackClr(RGB(0xFF, 0xFF, 0xE0));
 
 	try {
-		Database::getInstance().load(L"Data/biblio.db");
+		Database::getInstance().load(m_pathDB);
 	}
 	catch (std::exception ex)
 	{
@@ -233,7 +240,7 @@ BOOL InfoSysDlg::OnInitDialog()
 
     OnEditable();
     OnVirtualMode();    // Sets the grid mode, fills the grid
-	OnListmode();
+	//OnListmode();
     //OnCellReadonly();
     OnItalics();
     OnTitletips();
@@ -241,7 +248,7 @@ BOOL InfoSysDlg::OnInitDialog()
     OnFramefocus();
     OnRowResize();
     OnColResize();
-    OnSingleselmode();
+    //OnSingleselmode();
     OnSingleColMode();
     OnVertGridLines();
     OnHorzGridLines();
@@ -256,6 +263,7 @@ BOOL InfoSysDlg::OnInitDialog()
     m_Grid.SetFixedColumnSelection(TRUE);
     m_Grid.SetFixedRowSelection(TRUE);
 	m_Grid.EnableColumnHide();
+	m_Grid.SetListMode(TRUE);
 
     UpdateMenuUI();
 
@@ -264,6 +272,8 @@ BOOL InfoSysDlg::OnInitDialog()
 	m_Grid.SetCompareFunction(CGridCtrl::pfnCellNumericCompare);
 
 	
+	m_Grid.ExpandColumnsToFit(FALSE);
+	m_Grid.Refresh();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -414,7 +424,6 @@ void InfoSysDlg::OnHorzGridLines()
 
 void InfoSysDlg::OnListmode() 
 {
-	const auto& db = Database::getInstance();
     m_bListMode = !m_bListMode;
 	m_Grid.SetListMode(m_bListMode);
     UpdateMenuUI();
@@ -567,6 +576,10 @@ void InfoSysDlg::OnSize(UINT nType, int cx, int cy)
 	CWnd *pWnd = GetDlgItem(IDC_SIZEBOX);
 	if (pWnd)
 		pWnd->ShowWindow( (nType == SIZE_MAXIMIZED)? SW_HIDE : SW_SHOW);
+
+	m_Grid.ExpandColumnsToFit(FALSE);
+	m_Grid.Refresh();
+
 }
 
 #ifndef GRIDCONTROL_NO_CLIPBOARD
@@ -650,14 +663,9 @@ void InfoSysDlg::OnInsertRow()
     }
 	else
 	{
-		// if not exist rows then add nRow = 1
-		if (db.getRecords().empty())
-		{
-			nRow = 1;
-			const auto id = db.insertRow(nRow);
-			m_Grid.InsertRow(std::to_string(id).c_str());
-			m_Grid.Invalidate();
-		}
+		const auto id = db.insertRow(nRow);
+		m_Grid.InsertRow(std::to_string(id).c_str());
+		m_Grid.Invalidate();
 	}
 }
 
@@ -912,6 +920,7 @@ void InfoSysDlg::OnVirtualMode()
     m_bVirtualMode = !m_bVirtualMode;
 	m_Grid.SetVirtualMode(m_bVirtualMode);
     m_Grid.SetEditable(m_bEditable);
+	m_Grid.SetSingleRowSelection(TRUE);
 
     m_bHeaderSort = m_Grid.GetHeaderSort();
 
@@ -943,61 +952,61 @@ void InfoSysDlg::OnVirtualMode()
    // }
    // else
    // {
-		const Database& db = db.getInstance();
-		const Database::RecordMap& map = db.getRecords();
+	const Database& db = db.getInstance();
+	const Database::RecordMap& map = db.getRecords();
 
 
-        m_nFixCols = 1;
-	    m_nFixRows = 1;
-	    m_nCols = db.amountFields;
-		m_nRows = map.size() > 0? map.size() + 1: 1;
+    m_nFixCols = 1;
+	m_nFixRows = 1;
+	m_nCols = db.amountFields;
+	m_nRows = map.size() > 0? map.size() + 1: 1;
 
-        m_Grid.SetAutoSizeStyle();
+    m_Grid.SetAutoSizeStyle();
 
-	    TRY {
-		    m_Grid.SetRowCount(m_nRows);
-		    m_Grid.SetColumnCount(m_nCols);
-		    m_Grid.SetFixedRowCount(m_nFixRows);
-		    //m_Grid.SetFixedColumnCount(m_nFixCols);
-	    }
-	    CATCH (CMemoryException, e)
-	    {
-	    	e->ReportError();
-    		return;
-	    }
-		END_CATCH
+	TRY {
+		m_Grid.SetRowCount(m_nRows);
+		m_Grid.SetColumnCount(m_nCols);
+		m_Grid.SetFixedRowCount(m_nFixRows);
+		m_Grid.SetFixedColumnCount(m_nFixCols);
+	}
+	CATCH (CMemoryException, e)
+	{
+	    e->ReportError();
+    	return;
+	}
+	END_CATCH
 
-		// make title
-		int col_count = 0;
-		for (auto name : db.fieldNames) 
-		{
+	// make title
+	int col_count = 0;
+	for (auto name : db.fieldNames) 
+	{
+		GV_ITEM Item;
+		Item.mask = GVIF_TEXT;
+		Item.row = 0;
+		Item.col = col_count;
+		Item.strText = name;
+		Item.nFormat = DT_LEFT | DT_WORDBREAK;
+		m_Grid.SetItem(&Item);
+		col_count++;
+	}
+
+
+	// fill rows/cols with text
+	for (size_t row = 0; row < map.size(); row++)
+    {
+	    for (int col = 0; col < m_Grid.GetColumnCount(); col++)
+		{ 
+            CString str;
 			GV_ITEM Item;
-			Item.mask = GVIF_TEXT;
-			Item.row = 0;
-			Item.col = col_count;
-			Item.strText = name;
-			Item.nFormat = DT_LEFT | DT_WORDBREAK;
-			m_Grid.SetItem(&Item);
-			col_count++;
-		}
 
-
-	    // fill rows/cols with text
-	    for (int row = 0; row < map.size(); row++)
-        {
-	    	for (int col = 0; col < m_Grid.GetColumnCount(); col++)
-		    { 
-                CString str;
-			    GV_ITEM Item;
-
-    			Item.mask = GVIF_TEXT;
-	    		Item.row = row + 1;
-		    	Item.col = col;
-				Item.nFormat = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX;
-                Item.strText = map.at(row).fields.at(col).c_str();
-        		m_Grid.SetItem(&Item);
-	    	}
-        }
+    		Item.mask = GVIF_TEXT;
+	    	Item.row = row + 1;
+		    Item.col = col;
+			Item.nFormat = DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX;
+            Item.strText = map.at(row).fields.at(col).c_str();
+        	m_Grid.SetItem(&Item);
+	    }
+    }
     //}
 
     //m_Grid.GetDefaultCell(FALSE,FALSE)->SetFormat(DT_RIGHT|DT_VCENTER|DT_SINGLELINE|DT_NOPREFIX|DT_END_ELLIPSIS);
@@ -1148,6 +1157,21 @@ void InfoSysDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		m_Grid.ScreenToClient(&point);
 		CCellID cell = m_Grid.GetCellFromPt(point);
 		Trace(_T("Context menu called on row %d, col %d\n"), cell.row, cell.col);
+
+		//m_Grid.SelectRows(cell);
+		m_Grid.SetSelectedRange(cell.row, m_Grid.GetFixedColumnCount(), cell.row, m_Grid.GetColumnCount() - 1, TRUE);
+
+		ClientToScreen(&point);
+
+		CMenu menu;
+		VERIFY(menu.LoadMenu(IDR_MENU_CONTEXT));
+		CMenu *pSub = menu.GetSubMenu(0);
+		// Modify menu items here if necessary (e.g. gray out items)
+		int nCmd = pSub->TrackPopupMenuEx(
+			TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERPOSANIMATION | TPM_RETURNCMD | TPM_NONOTIFY,
+			point.x, point.y, AfxGetMainWnd(), NULL);
+		if (nCmd)
+			SendMessage(WM_COMMAND, nCmd);
 	}
 }
 
@@ -1190,4 +1214,41 @@ void InfoSysDlg::OnHide2ndrowcolumn()
 	}
 	m_Grid.Refresh();
 	UpdateMenuUI();
+}
+
+
+void InfoSysDlg::OnDeleteAllRows()
+{
+	if (AfxMessageBox("Удалить все данные?", MB_YESNO | MB_ICONSTOP) == IDYES)
+	{
+		if ((AfxMessageBox("Сделать бекап данных?", MB_YESNO | MB_ICONSTOP) == IDYES))
+		{
+			try
+			{
+				Database::getInstance().save(m_pathBackup);
+			}
+			catch (std::exception ex)
+			{
+				MessageBox(ex.what(), "Ошибка создания бекапа данных", MB_OK | MB_ICONERROR);
+			}
+		}
+		m_Grid.DeleteNonFixedRows();
+		Database::getInstance().deleteAllRows();
+		m_Grid.Invalidate();
+	}
+}
+
+
+void InfoSysDlg::OnDestroy()
+{
+	CDialog::OnDestroy();
+
+	try
+	{
+		Database::getInstance().save(m_pathDB);
+	}
+	catch (std::exception ex)
+	{
+		MessageBox(ex.what(), "Ошибка сохранения данных", MB_OK | MB_ICONERROR);
+	}
 }

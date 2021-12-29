@@ -724,12 +724,15 @@ protected:
     int         m_nHeaderHeight, m_nFooterHeight, m_nLeftMargin,
                 m_nRightMargin, m_nTopMargin, m_nBottomMargin, m_nGap;
 
-protected:
+public:
     void SelectAllCells();
     void SelectColumns(CCellID currentCell, BOOL bForceRedraw=FALSE, BOOL bSelectCells=TRUE);
     void SelectRows(CCellID currentCell, BOOL bForceRedraw=FALSE, BOOL bSelectCells=TRUE);
     void SelectCells(CCellID currentCell, BOOL bForceRedraw=FALSE, BOOL bSelectCells=TRUE);
     void OnSelecting(const CCellID& currentCell);
+
+protected:
+
 
     // Generated message map functions
     //{{AFX_MSG(CGridCtrl)

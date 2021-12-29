@@ -12,6 +12,10 @@
 #include "NewCellTypes/GridCellDateTime.h"
 #include "Database.h"
 
+#include <cctype>
+#include <charconv>
+#include <algorithm>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -89,7 +93,8 @@ void InfoSysDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_COLS, m_nCols);
 	DDX_Text(pDX, IDC_EDIT_ROWS, m_nRows);*/
 	DDX_Control(pDX, IDC_GRID, m_Grid);             // associate the grid window with a C++ object
-	//}}AFX_DATA_MAP
+													//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_EDIT_SEARCH, m_SearchBox);
 }
 
 BEGIN_MESSAGE_MAP(InfoSysDlg, CDialog)
@@ -169,6 +174,7 @@ BEGIN_MESSAGE_MAP(InfoSysDlg, CDialog)
 #endif
 	ON_COMMAND(IDC_DELETEALL_ROW, &InfoSysDlg::OnDeleteAllRows)
 	ON_WM_DESTROY()
+	ON_EN_CHANGE(IDC_EDIT_SEARCH, &InfoSysDlg::OnEnChangeEditSearch)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -264,6 +270,7 @@ BOOL InfoSysDlg::OnInitDialog()
     m_Grid.SetFixedRowSelection(TRUE);
 	m_Grid.EnableColumnHide();
 	m_Grid.SetListMode(TRUE);
+	m_Grid.SetDoubleBuffering(TRUE);
 
     UpdateMenuUI();
 
@@ -1216,6 +1223,26 @@ void InfoSysDlg::OnHide2ndrowcolumn()
 	UpdateMenuUI();
 }
 
+void InfoSysDlg::ShowHideRow(int row, bool bShow)
+{
+
+	if (!bShow)
+	{
+		m_Grid.SetColumnWidth(1,0);
+		m_Grid.SetRowHeight(row,0);
+	}
+	else
+	{
+		m_Grid.SetColumnWidth(1,1);
+		m_Grid.AutoSizeColumn(1);
+		m_Grid.SetRowHeight(row,1);
+		m_Grid.AutoSizeRow(row);
+	}
+	m_Grid.ExpandColumnsToFit(FALSE);
+
+	//m_Grid.Refresh();
+}
+
 
 void InfoSysDlg::OnDeleteAllRows()
 {
@@ -1250,5 +1277,53 @@ void InfoSysDlg::OnDestroy()
 	catch (std::exception ex)
 	{
 		MessageBox(ex.what(), "Ошибка сохранения данных", MB_OK | MB_ICONERROR);
+	}
+}
+
+std::wstring str_toupper(std::wstring s) 
+{
+	auto& f = std::use_facet<std::ctype<wchar_t>>(std::locale());
+	f.toupper(&s[0], &s[0] + s.size());
+
+	return s;
+}
+
+void InfoSysDlg::OnEnChangeEditSearch()
+{
+	CString search_str_edit;
+	m_SearchBox.GetWindowText(search_str_edit);
+	auto rec = Database::getInstance().getRecords();
+
+	USES_CONVERSION;
+	std::wstring search_str = A2W((LPCTSTR)search_str_edit);
+	search_str = str_toupper(search_str);
+
+	// show all rows if search string less than 3 symbols
+	if (search_str.length() < 3)
+	{
+		// we have one row for title so we need to add 1
+		for (size_t i = 0; i < rec.size(); i++)
+			ShowHideRow(i + 1, true);
+
+		return;
+	}
+
+
+	for (size_t i = 0; i < rec.size(); i++)
+	{
+		bool b_find = false;
+		for (auto field : rec.at(i).fields)
+		{
+			// convert to upper case
+			auto ff = str_toupper(field);
+			if (ff.find(search_str.c_str()) != std::wstring::npos)
+			{
+				b_find = true;
+				break;
+			}
+		}
+
+		// we have one row for title so we need to add 1
+		ShowHideRow(i + 1, b_find);
 	}
 }

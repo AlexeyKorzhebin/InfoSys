@@ -72,6 +72,8 @@ public:
 	void OnGridLines();
     void UpdateMenuUI();
 	void Trace(LPCTSTR szFmt, ...);
+	void ShowHideRow(int row, bool bShow);
+
 
 // Implementation
 protected:
@@ -151,6 +153,8 @@ public:
 	afx_msg void OnHide2ndrowcolumn();
 	afx_msg void OnDeleteAllRows();
 	afx_msg void OnDestroy();
+	afx_msg void OnEnChangeEditSearch();
+	CEdit m_SearchBox;
 };
 
 //{{AFX_INSERT_LOCATION}}

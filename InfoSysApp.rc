@@ -21,47 +21,8 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Menu
-//
-
-IDR_MENU_CONTEXT MENU
-BEGIN
-    POPUP "Context"
-    BEGIN
-        MENUITEM "Insert",                      IDC_INSERT_ROW
-        MENUITEM "Remove",                      IDC_DELETE_ROW
-        MENUITEM "DeleteAll",                   IDC_DELETEALL_ROW
-    END
-END
-
-#endif    // Русский (Россия) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Английский (США) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Dialog
 //
-
-IDD_ABOUTBOX DIALOGEX 0, 0, 235, 98
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About InfoSys"
-FONT 8, "MS Sans Serif", 0, 0, 0x0
-BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
-    LTEXT           "InfoSysApp Version 1.0",IDC_STATIC,40,7,119,8,SS_NOPREFIX
-    LTEXT           "Copyright (c) 1998-2004",IDC_STATIC,40,80,119,8
-    DEFPUSHBUTTON   "OK",IDOK,196,7,32,14,WS_GROUP
-    LTEXT           "Written by Chris Maunder\nchris@codeproject.com",IDC_STATIC,40,22,97,19
-    LTEXT           "Based on the original WorldCom grid control written by Joe Willcoxson (chinajoe@bigfoot.com)\nweb: http://user.aol.com/chinajoe/wcmfclib.html",IDC_STATIC,40,43,171,29
-END
 
 IDD_GRIDCTRLDEMO_DIALOG DIALOGEX 0, 0, 399, 251
 STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
@@ -69,45 +30,9 @@ CAPTION "MFC Grid Control Demo"
 MENU IDR_MENU
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Custom1",IDC_GRID,"MFCGridCtrl",WS_TABSTOP,7,7,390,242
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904B0"
-        BEGIN
-            VALUE "FileDescription", "InfoSysApp MFC Application"
-            VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "InfoSysApp"
-            VALUE "LegalCopyright", "Copyright (C) 1998"
-            VALUE "OriginalFilename", "InfoSysApp.EXE"
-            VALUE "ProductName", "InfoSysApp Application"
-            VALUE "ProductVersion", "1, 0, 0, 1"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
+    CONTROL         "Custom1",IDC_GRID,"MFCGridCtrl",WS_TABSTOP,7,18,390,231
+    LTEXT           "Найти:",IDC_STATIC,8,6,24,8
+    EDITTEXT        IDC_EDIT_SEARCH,35,4,80,14,ES_AUTOHSCROLL
 END
 
 
@@ -119,75 +44,11 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    IDD_ABOUTBOX, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 228
-        VERTGUIDE, 40
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 91
-    END
-
     IDD_GRIDCTRLDEMO_DIALOG, DIALOG
     BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
-
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
-    "#define _AFX_NO_OLE_RESOURCES\r\n"
-    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
-    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
-    "\r\n"
-    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
-    "#ifdef _WIN32\r\n"
-    "LANGUAGE 9, 1\r\n"
-    "#pragma code_page(1252)\r\n"
-    "#endif\r\n"
-    "#include ""res\\InfoSysApp.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
-    "#include ""afxres.rc""         // Standard components\r\n"
-    "#endif\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\InfoSys.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_IMAGES              BITMAP                  "res\\smallico.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -277,6 +138,16 @@ BEGIN
     END
 END
 
+IDR_MENU_CONTEXT MENU
+BEGIN
+    POPUP "Context"
+    BEGIN
+        MENUITEM "Insert",                      IDC_INSERT_ROW
+        MENUITEM "Remove",                      IDC_DELETE_ROW
+        MENUITEM "DeleteAll",                   IDC_DELETEALL_ROW
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -287,6 +158,148 @@ IDD_GRIDCTRLDEMO_DIALOG AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
+
+#endif    // Русский (Россия) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Английский (США) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 98
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About InfoSys"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
+    LTEXT           "InfoSysApp Version 1.0",IDC_STATIC,40,7,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (c) 1998-2004",IDC_STATIC,40,80,119,8
+    DEFPUSHBUTTON   "OK",IDOK,196,7,32,14,WS_GROUP
+    LTEXT           "Written by Chris Maunder\nchris@codeproject.com",IDC_STATIC,40,22,97,19
+    LTEXT           "Based on the original WorldCom grid control written by Joe Willcoxson (chinajoe@bigfoot.com)\nweb: http://user.aol.com/chinajoe/wcmfclib.html",IDC_STATIC,40,43,171,29
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "InfoSysApp MFC Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "InfoSysApp"
+            VALUE "LegalCopyright", "Copyright (C) 1998"
+            VALUE "OriginalFilename", "InfoSysApp.EXE"
+            VALUE "ProductName", "InfoSysApp Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        VERTGUIDE, 40
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 91
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif\r\n"
+    "#include ""res\\InfoSysApp.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\InfoSys.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_IMAGES              BITMAP                  "res\\smallico.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////

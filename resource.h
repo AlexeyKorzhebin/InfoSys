@@ -37,6 +37,8 @@
 #define IDC_TRACE                       1041
 #define IDC_CLEARTRACE                  1042
 #define IDC_CELL_DATETIME2              1043
+#define IDC_EDIT1                       1044
+#define IDC_EDIT_SEARCH                 1044
 #define ID_EDIT_SELECTALL               32771
 #define ID_OPTIONS_ALLOWCELLSELECTION   32772
 #define ID_OPTIONS_SHOWVERTICALLINES    32773
@@ -84,7 +86,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         33052
-#define _APS_NEXT_CONTROL_VALUE         1044
+#define _APS_NEXT_CONTROL_VALUE         1045
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

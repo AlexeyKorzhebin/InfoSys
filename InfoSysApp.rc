@@ -58,19 +58,19 @@ END
 
 IDR_MENU MENU
 BEGIN
-    POPUP "&File"
+    POPUP "&Файл"
     BEGIN
-        MENUITEM "&Print...\tCtrl+P",           IDC_PRINT_BUTTON
+        MENUITEM "&Печать...\tCtrl+P",          IDC_PRINT_BUTTON
         MENUITEM SEPARATOR
-        MENUITEM "E&xit",                       ID_APP_EXIT
+        MENUITEM "В&ыход",                      ID_APP_EXIT
     END
-    POPUP "&Edit"
+    POPUP "&Редактирование"
     BEGIN
-        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
-        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
-        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "Выре&зать\tCtrl+X",           ID_EDIT_CUT
+        MENUITEM "&Копировать\tCtrl+C",         ID_EDIT_COPY
+        MENUITEM "&Вставить\tCtrl+V",           ID_EDIT_PASTE
         MENUITEM SEPARATOR
-        MENUITEM "Select All\tCtrl-A",          ID_EDIT_SELECTALL
+        MENUITEM "Выделить все\tCtrl-A",        ID_EDIT_SELECTALL
     END
     POPUP "&Options"
     BEGIN
@@ -132,19 +132,19 @@ BEGIN
             MENUITEM "Use callback function",       IDC_CALLBACK_FUNCTION
         END
     END
-    POPUP "&Help"
+    POPUP "&Помощь"
     BEGIN
-        MENUITEM "&About InfoSys...",           ID_APP_ABOUT
+        MENUITEM "&О InfoSys...",               ID_APP_ABOUT
     END
 END
 
 IDR_MENU_CONTEXT MENU
 BEGIN
-    POPUP "Context"
+    POPUP "Контекстное меню"
     BEGIN
-        MENUITEM "Insert",                      IDC_INSERT_ROW
-        MENUITEM "Remove",                      IDC_DELETE_ROW
-        MENUITEM "DeleteAll",                   IDC_DELETEALL_ROW
+        MENUITEM "Вставить строку",             IDC_INSERT_ROW
+        MENUITEM "Удалить строку",              IDC_DELETE_ROW
+        MENUITEM "Удалить всё",                 IDC_DELETEALL_ROW
     END
 END
 

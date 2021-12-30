@@ -93,14 +93,7 @@ void Database::save(const std::wstring& fname)
 		for (const auto field : record.fields)
 		{
 			ofs << field.c_str() << L";";
-			//b_save = true;
 		}
-		
-		// if one field is exist then insert return caret
-		//if (b_save)
-		//{
-		//	ofs << std::endl;
-		//}
 	}
 
 
